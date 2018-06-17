@@ -13,16 +13,21 @@ class ApplicationController < Sinatra::Base
       erb :index
   end
 
-  get '/users/signup' do
-      erb :'user/create_user'
+  get '/signup' do
+      erb :'users/create_user'
   end
 
-  post '/users/signup' do
-      binding.pry
-      erb :'/users/show'
+  post '/signup' do #CREATE HELPER METHODS  
+      binding.pry #checks if user has account already, then create user.
+      #set session_id
+
+      redirect to "/tweets"
   end
 
   get '/tweets' do
+      #with session user_id
+      #checks if user is logged_in
+      #if current_user
 
       erb :'/tweets/tweets'
   end
