@@ -17,19 +17,27 @@ class ApplicationController < Sinatra::Base
       erb :'users/create_user'
   end
 
-  post '/signup' do #CREATE HELPER METHODS  
-      binding.pry #checks if user has account already, then create user.
-      #set session_id
-
-      redirect to "/tweets"
+  post '/signup' do
+      binding.pry
+      if params['username'] == "" || params['email'] == "" || params['password'] == ""
+          binding.pry
+         redirect to :'/signup'
+     else
+         binding.pry
+            @user = User.create(params)
+            session[:id] = @user.id
+            redirect to :'/tweets'
+      end
   end
 
   get '/tweets' do
-      #with session user_id
-      #checks if user is logged_in
-      #if current_user
-
-      erb :'/tweets/tweets'
+      @user = User.find(session[:id])
+      if Helpers.is_logged_in?(session)
+          erb :'/tweets/tweets'
+      else
+          redirect to :"/"
+          #flash message
+      end
   end
 
   get '/tweets/new' do
@@ -56,7 +64,4 @@ class ApplicationController < Sinatra::Base
 
        redirect to :"/tweets/#{@tweet.id}"
   end
-
-
-
 end
