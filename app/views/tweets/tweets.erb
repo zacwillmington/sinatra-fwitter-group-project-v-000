@@ -1,5 +1,9 @@
+<h1>Welcome, <%=@user.username%></h1>
+
 <h2>All Tweets</h2>
-<h4><%=@user.username%></h4>
-<%@user.tweets.each do |tweet|%>
+<%@tweets.each do |tweet|%>
      <p>Content: <%=tweet.content%></p>
 <%end%>
+<form action="/logout" method="post">
+    <input type="submit" name="Logout">
+</form>
