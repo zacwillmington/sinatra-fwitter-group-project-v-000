@@ -19,21 +19,27 @@ class ApplicationController < Sinatra::Base
 
   post '/signup' do
       binding.pry
-      if params['username'] == "" || params['email'] == "" || params['password'] == ""
+      if Helpers.is_logged_in?(session)
           binding.pry
+          redirect to :'/tweets'
+     elsif params['username'] == "" || params['email'] == "" || params['password'] == ""
+         binding.pry
          redirect to :'/signup'
      else
-         binding.pry
-            @user = User.create(params)
+          binding.pry
+            @user = User.create(:username => params['username'], :email => params['email'], :password_digest => params['password'])
             session[:id] = @user.id
             redirect to :'/tweets'
       end
   end
 
   get '/tweets' do
-      @user = User.find(session[:id])
+      binding.pry
+
       if Helpers.is_logged_in?(session)
-          erb :'/tweets/tweets'
+          binding.pry
+          @user = User.find(session[:id])
+          erb :'tweets/tweets'
       else
           redirect to :"/"
           #flash message
@@ -43,9 +49,9 @@ class ApplicationController < Sinatra::Base
   get '/tweets/new' do
       erb :'/tweets/create_tweet'
   end
-
+  
   post '/tweets' do
-     binding.pry
+    #  binding.pry
      @tweet = Tweet.find_by(:content => params['content'])
      redirect to :"/tweets/#{@tweet.id}"
   end
