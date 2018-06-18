@@ -2,6 +2,11 @@
 <h2><%=@user.username%></h2>
 <h3>Tweets: </h3>
 
-<%@user.tweets.each_with_index do |index, tweet|%>
-     <p><%=index%>. <%=tweet.content%></p>
+<%@user.tweets.each do |tweet|%>
+     <p><%=tweet.content%></p>
+     <a href="/tweets/<%=tweet.id%>/edit">Edit Tweet</a>
 <%end%>
+<br>
+<a href="/tweets">Return to Tweets</a>
+<br>
+<a href="/logout">Logout</a>

@@ -1,4 +1,5 @@
 require './config/environment'
+require 'bcrypt'
 
 class ApplicationController < Sinatra::Base
 
@@ -28,7 +29,7 @@ class ApplicationController < Sinatra::Base
 
           redirect to '/signup'
       else
-          @user = User.create(:username => params['username'], :email => params['email'], :password_digest => params['password'])
+          @user = User.create(:username => params['username'], :email => params['email'], :password => params['password'])
           session[:id] = @user.id
           redirect to '/tweets'
       end
@@ -43,6 +44,7 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/login' do
+      binding.pry
        @user = User.find_by(:username => params['username'])
        if @user == nil
            #flash "We can't find your account. Try signing up"
@@ -59,8 +61,8 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/users/:slug' do
-      if Helpers.is_logged_in(session)
-          @user = Helpers.current_users(session)
+      if Helpers.is_logged_in?(session)
+          @user = Helpers.current_user(session)
           erb :'/users/show'
       else
           redirect to '/login'
@@ -91,9 +93,8 @@ class ApplicationController < Sinatra::Base
   post '/tweets' do
      if Helpers.is_logged_in?(session) && params['content'] != ""
          @user = Helpers.current_user(session)
-         @tweet = Tweet.create(:content => params['content'])
-         @tweet.user = @user
-         @tweet.save
+         @tweet = Tweet.create(:content => params['content'], :user_id => @user.id)
+         @user.save
          redirect to "/tweets"
      else
          redirect to "/tweets/new"
@@ -110,15 +111,35 @@ class ApplicationController < Sinatra::Base
       end
   end
 
-  delete '/tweet'
+  delete '/tweets/:id/delete' do
+      @tweet = Tweet.find(params[:id])
+      @user = Helpers.current_user(session)
+      if @user.tweets.include?(@tweet)
+          @tweet.delete
+          redirect to '/tweets'
+      else
+          redirect to "/tweets/#{@tweet.id}"
+      end
+  end
 
-  # get '/tweets/:id/edit' do
-  #
-  #     erb :'/tweets/edit_tweet'
-  # end
-  #
-  # post '/tweets/:id' do
-  #
-  #      redirect to "/tweets/#{@tweet.id}"
-  # end
+  get '/tweets/:id/edit' do
+      @tweet = Tweet.find(params[:id])
+      @user = Helpers.current_user(session)
+      if Helpers.is_logged_in?(session) &&             @user.tweets.include?(@tweet)
+          erb :'/tweets/edit_tweet'
+      else
+          redirect to '/login'
+      end
+  end
+
+  patch '/tweets/:id/edit' do
+      @tweet = Tweet.find(params[:id])
+      @user = Helpers.current_user(session)
+      if params['content'] != "" &&             @user.tweets.include?(@tweet)
+          @tweet.content = params['content']
+          @tweet.save
+       end
+       redirect to "/tweets/#{@tweet.id}"
+  end
+
 end

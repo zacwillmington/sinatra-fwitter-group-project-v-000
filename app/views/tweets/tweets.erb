@@ -1,9 +1,10 @@
 <h1>Welcome, <%=@user.username%></h1>
-
+<a href="/tweets/new">Create New Tweet</a>
+<a href="/users/<%=@user.slug%>">View Your Tweets</a>
 <h2>All Tweets</h2>
 <%@tweets.each do |tweet|%>
-     <p>Content: <%=tweet.content%></p>
+     <h4><%=tweet.user.username%></h4> <p><%=tweet.content%></p>
+     <a href="/tweets/<%=tweet.id%>">View Tweet</a>
 <%end%>
-<form action="/logout" method="post">
-    <input type="submit" name="Logout">
-</form>
+<br>
+<a href="/logout">Logout</a>
