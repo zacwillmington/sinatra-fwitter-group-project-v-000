@@ -14,46 +14,59 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/signup' do
+      if Helpers.is_logged_in?(session)
+          redirect to '/tweets'
+      end
       erb :'users/create_user'
   end
 
   post '/signup' do
-      binding.pry
       if Helpers.is_logged_in?(session)
-          binding.pry
-          redirect to :'/tweets'
-     elsif params['username'] == "" || params['email'] == "" || params['password'] == ""
-         binding.pry
-         redirect to :'/signup'
-     else
-          binding.pry
-            @user = User.create(:username => params['username'], :email => params['email'], :password_digest => params['password'])
-            session[:id] = @user.id
-            redirect to :'/tweets'
+
+          redirect to '/tweets'
+      elsif Helpers.is_params_empty(params)
+
+          redirect to '/signup'
+      else
+          @user = User.create(:username => params['username'], :email => params['email'], :password_digest => params['password'])
+          session[:id] = @user.id
+
+          redirect to '/tweets'
       end
+  end
+
+  get '/login' do
+      binding.pry
+      
+      erb :'/users/login'
+  end
+
+  post '/login' do
+      binding.pry
+
+      redirect to "/tweets/#{@tweet.id}"
   end
 
   get '/tweets' do
-      binding.pry
+       if Helpers.is_logged_in?(session)
+          @user = Helpers.current_user(session)
 
-      if Helpers.is_logged_in?(session)
-          binding.pry
-          @user = User.find(session[:id])
           erb :'tweets/tweets'
-      else
-          redirect to :"/"
+       else
+           redirect to "/"
           #flash message
-      end
+       end
   end
 
   get '/tweets/new' do
+
       erb :'/tweets/create_tweet'
   end
-  
+
   post '/tweets' do
-    #  binding.pry
      @tweet = Tweet.find_by(:content => params['content'])
-     redirect to :"/tweets/#{@tweet.id}"
+
+     redirect to "/tweets/#{@tweet.id}"
   end
 
   get '/tweets/:id' do
@@ -68,6 +81,6 @@ class ApplicationController < Sinatra::Base
 
   post '/tweets/:id' do
 
-       redirect to :"/tweets/#{@tweet.id}"
+       redirect to "/tweets/#{@tweet.id}"
   end
 end

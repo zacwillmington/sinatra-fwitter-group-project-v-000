@@ -1,5 +1,5 @@
 <h2>All Tweets</h2>
-<h4><%=binding.pry@user.username%></h4>
+<h4><%=@user.username%></h4>
 <%@user.tweets.each do |tweet|%>
-    <p><%=tweet.content%></p>
+     <p>Content: <%=tweet.content%></p>
 <%end%>
