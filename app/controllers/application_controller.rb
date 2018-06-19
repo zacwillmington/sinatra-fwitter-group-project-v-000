@@ -22,7 +22,6 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/signup' do
-      binding.pry
       if Helpers.is_logged_in?(session)
           redirect to '/tweets'
       elsif Helpers.is_params_empty?(params)
@@ -59,7 +58,6 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/users/:slug' do
-      binding.pry
           @user = User.find_by_slug(params[:slug])
           erb :'/users/show'
   end
@@ -97,7 +95,6 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/tweets/:id' do
-      binding.pry
       @tweet = Tweet.find_by(:id => params[:id])
       if Helpers.is_logged_in?(session) && @tweet != nil
           @user = Helpers.current_user(session)
@@ -119,9 +116,9 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/tweets/:id/edit' do
-      @tweet = Tweet.find(params[:id])
+      @tweet = Tweet.find_by(:id => params[:id])
       @user = Helpers.current_user(session)
-      if Helpers.is_logged_in?(session) && @user.tweets.include?(@tweet)
+      if Helpers.is_logged_in?(session)
           erb :'/tweets/edit_tweet'
       else
           redirect to "/login"
@@ -131,7 +128,7 @@ class ApplicationController < Sinatra::Base
   patch '/tweets/:id/edit' do
       @tweet = Tweet.find(params[:id])
       @user = Helpers.current_user(session)
-      if params['content'] != "" && @user.tweets.include?(@tweet)
+      if params['content'] != "" && @user.tweets.include?(@tweet) && Helpers.is_logged_in?(session)
           @tweet.content = params['content']
           @tweet.save
            redirect to "/tweets/#{@tweet.id}"

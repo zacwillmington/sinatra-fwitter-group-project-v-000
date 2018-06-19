@@ -3,7 +3,7 @@
 <form action="/tweets/<%=@tweet.id%>/edit" method="post">
     <input id="hidden" type="hidden" name="_method" value="patch">
     <label for="content">Content:</label>
-    <input type="text" name="content">
+    <input id="content" type="text" name="content">
     <br>
     <input type="submit" name="submit" value="submit">
 </form>
