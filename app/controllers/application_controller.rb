@@ -22,13 +22,13 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/signup' do
+      binding.pry
       if Helpers.is_logged_in?(session)
-
           redirect to '/tweets'
-      elsif Helpers.is_params_empty(params)
-
+      elsif Helpers.is_params_empty?(params)
           redirect to '/signup'
       else
+
           @user = User.create(:username => params['username'], :email => params['email'], :password => params['password'])
           session[:id] = @user.id
           redirect to '/tweets'
@@ -44,10 +44,8 @@ class ApplicationController < Sinatra::Base
   end
 
   post '/login' do
-      binding.pry
        @user = User.find_by(:username => params['username'])
        if @user == nil
-           #flash "We can't find your account. Try signing up"
            redirect to '/signup'
        elsif @user.authenticate(params['password'])
            session[:id] = @user.id
@@ -61,12 +59,9 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/users/:slug' do
-      if Helpers.is_logged_in?(session)
-          @user = Helpers.current_user(session)
+      binding.pry
+          @user = User.find_by_slug(params[:slug])
           erb :'/users/show'
-      else
-          redirect to '/login'
-      end
   end
 
 
@@ -78,7 +73,7 @@ class ApplicationController < Sinatra::Base
           erb :'tweets/tweets'
        else
            redirect to "/login"
-          #flash message "Sign Up or Login."
+
        end
   end
 
@@ -102,12 +97,13 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/tweets/:id' do
-      if Helpers.is_logged_in?(session)
-          @tweet = Tweet.find(params[:id])
+      binding.pry
+      @tweet = Tweet.find_by(:id => params[:id])
+      if Helpers.is_logged_in?(session) && @tweet != nil
           @user = Helpers.current_user(session)
           erb :'/tweets/show_tweet'
       else
-          redirect to '/login'
+          redirect to "/login"
       end
   end
 
@@ -125,21 +121,23 @@ class ApplicationController < Sinatra::Base
   get '/tweets/:id/edit' do
       @tweet = Tweet.find(params[:id])
       @user = Helpers.current_user(session)
-      if Helpers.is_logged_in?(session) &&             @user.tweets.include?(@tweet)
+      if Helpers.is_logged_in?(session) && @user.tweets.include?(@tweet)
           erb :'/tweets/edit_tweet'
       else
-          redirect to '/login'
+          redirect to "/login"
       end
   end
 
   patch '/tweets/:id/edit' do
       @tweet = Tweet.find(params[:id])
       @user = Helpers.current_user(session)
-      if params['content'] != "" &&             @user.tweets.include?(@tweet)
+      if params['content'] != "" && @user.tweets.include?(@tweet)
           @tweet.content = params['content']
           @tweet.save
-       end
-       redirect to "/tweets/#{@tweet.id}"
+           redirect to "/tweets/#{@tweet.id}"
+      else
+          redirect to "/tweets/#{@tweet.id}/edit"
+      end
   end
 
 end

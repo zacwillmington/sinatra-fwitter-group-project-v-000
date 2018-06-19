@@ -3,7 +3,8 @@
 <h3>Tweets: </h3>
 
 <%@user.tweets.each do |tweet|%>
-     <p><%=tweet.content%></p>
+     <p><%= binding.pry
+      tweet.content%></p>
      <a href="/tweets/<%=tweet.id%>/edit">Edit Tweet</a>
 <%end%>
 <br>

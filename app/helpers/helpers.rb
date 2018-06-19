@@ -16,7 +16,7 @@ class Helpers
         end
     end
 
-    def self.is_params_empty(params)
+    def self.is_params_empty?(params)
         params['username'] == "" || params['email'] == "" || params['password'] == ""
     end
 end
