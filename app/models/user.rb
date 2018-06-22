@@ -3,6 +3,8 @@ require 'bcrypt'
 class User < ActiveRecord::Base
     has_many :tweets
     has_secure_password
+    validates_associated :tweets
+    validates :username, :email, :password, presence: true
 
     def slug
         username = self.username.gsub(" ", "-").downcase
