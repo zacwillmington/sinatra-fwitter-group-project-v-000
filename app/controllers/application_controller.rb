@@ -139,22 +139,25 @@ class ApplicationController < Sinatra::Base
 
 end
 
-def self.current_user(session)
-        if session[:id]
-            @user = User.find(session[:id])
-        else
-            nil
-        end
-    end
+helpers do
 
-    def self.is_logged_in?(session)
-        if session[:id] &&  self.current_user(session).id == session[:id]
-            true
-        else
-            false
+    def self.current_user(session)
+            if session[:id]
+                @user = User.find(session[:id])
+            else
+                nil
+            end
         end
-    end
 
-    def self.is_params_empty?(params)
-        params['username'] == "" || params['email'] == "" || params['password'] == ""
-    end
+        def self.is_logged_in?(session)
+            if session[:id] &&  self.current_user(session).id == session[:id]
+                true
+            else
+                false
+            end
+        end
+
+        def self.is_params_empty?(params)
+            params['username'] == "" || params['email'] == "" || params['password'] == ""
+        end
+end
